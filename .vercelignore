@@ -1,0 +1,4 @@
+# No ignorar nada, subir todo
+!js/
+!js/*.js
+
