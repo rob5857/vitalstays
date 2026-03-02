@@ -2,9 +2,10 @@
 // SUPABASE CLIENT - VITAL STAYS
 // ============================================
 
-// CONFIGURACIÓN: Reemplaza con tus credenciales de Supabase
-const SUPABASE_URL = 'https://tu-proyecto.supabase.co';
-const SUPABASE_ANON_KEY = 'tu-anon-key-aqui';
+// CONFIGURACIÓN: Credenciales de Supabase
+// IMPORTANTE: Ve a Supabase > Settings > API para obtener estas credenciales
+const SUPABASE_URL = 'https://snukjmuffprpeluwzris.supabase.co'; // Ejemplo: https://abcdefgh.supabase.co
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNudWtqbXVmZnBycGVsdXd6cmlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MDgyNzAsImV4cCI6MjA4Nzk4NDI3MH0.C15TVe7m9QjGSj78_ZGPKycX2XFwAenEDpB7pycvh94'; // La clave "anon public"
 
 // Inicializar cliente Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -24,7 +25,7 @@ async function signInWithProvider(provider) {
         redirectTo: window.location.origin + '/dashboard.html'
       }
     });
-    
+
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
@@ -114,16 +115,16 @@ async function getApartments(filters = {}) {
     }
 
     const { data, error } = await query;
-    
+
     if (error) throw error;
-    
+
     // Ordenar imágenes por sort_order
     data.forEach(apt => {
       if (apt.apartment_images) {
         apt.apartment_images.sort((a, b) => a.sort_order - b.sort_order);
       }
     });
-    
+
     return { success: true, data };
   } catch (error) {
     console.error('Error obteniendo apartamentos:', error);
@@ -148,14 +149,14 @@ async function getApartmentById(id) {
       `)
       .eq('id', id)
       .single();
-    
+
     if (error) throw error;
-    
+
     // Ordenar imágenes
     if (data.apartment_images) {
       data.apartment_images.sort((a, b) => a.sort_order - b.sort_order);
     }
-    
+
     return { success: true, data };
   } catch (error) {
     console.error('Error obteniendo apartamento:', error);
@@ -173,7 +174,7 @@ async function saveApartment(apartmentData) {
       .upsert(apartmentData)
       .select()
       .single();
-    
+
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
@@ -191,7 +192,7 @@ async function deleteApartment(id) {
       .from('apartments')
       .delete()
       .eq('id', id);
-    
+
     if (error) throw error;
     return { success: true };
   } catch (error) {
@@ -211,21 +212,21 @@ async function uploadImage(file, apartmentId) {
   try {
     const fileExt = file.name.split('.').pop();
     const fileName = `${apartmentId}/${Date.now()}.${fileExt}`;
-    
+
     const { data, error } = await supabase.storage
       .from('apartments')
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false
       });
-    
+
     if (error) throw error;
-    
+
     // Obtener URL pública
     const { data: { publicUrl } } = supabase.storage
       .from('apartments')
       .getPublicUrl(fileName);
-    
+
     return { success: true, url: publicUrl };
   } catch (error) {
     console.error('Error subiendo imagen:', error);
@@ -247,7 +248,7 @@ async function saveApartmentImage(apartmentId, url, sortOrder = 0) {
       })
       .select()
       .single();
-    
+
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
@@ -265,7 +266,7 @@ async function deleteApartmentImage(imageId) {
       .from('apartment_images')
       .delete()
       .eq('id', imageId);
-    
+
     if (error) throw error;
     return { success: true };
   } catch (error) {
@@ -288,7 +289,7 @@ async function createRentalApplication(applicationData) {
       .insert(applicationData)
       .select()
       .single();
-    
+
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
@@ -306,7 +307,7 @@ async function getRentalApplications() {
       .from('rental_applications')
       .select('*')
       .order('submitted_at', { ascending: false });
-    
+
     if (error) throw error;
     return { success: true, data };
   } catch (error) {
